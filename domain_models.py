@@ -11,7 +11,7 @@ class DomainModel(BaseModel):
 class ProjectDomain(DomainModel):
     name: str
     client: str
-    id: int
+    id: Optional[int] = Field(default=None)
 
 
 class EmployeeDomain(DomainModel):
@@ -19,7 +19,7 @@ class EmployeeDomain(DomainModel):
     firstname: str
     lastname: str
     age: int
-    id: int
+    id: Optional[int] = Field(default=None)
 
 
 class DepartmentDomain(DomainModel):
