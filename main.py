@@ -49,6 +49,13 @@ def read_department(department_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Department not found")
     return department
 
+@app.get("/departments/", response_model=list[DepartmentDomain])
+def read_departments(db: Session = Depends(get_db)):
+    departments = department_service.get_all_departments()
+    if departments is None:
+        raise HTTPException(status_code=404, detail="Departments not found")
+    return departments
+
 
 @app.put("/departments/{department_id}", response_model=DepartmentDomain)
 def update_department(
@@ -82,6 +89,12 @@ def read_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
 
+@app.get("/employees/", response_model=list[EmployeeDomain])
+def read_employee(db: Session = Depends(get_db)):
+    employees = employee_service.get_all_employees()
+    if employees is None:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return employees
 
 @app.put("/employees/{employee_id}", response_model=EmployeeDomain)
 def update_employee(
@@ -113,6 +126,13 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
     if project is None:
         raise HTTPException(status_code=404, detail="Project not found")
     return project
+
+@app.get("/projects/", response_model=list[ProjectDomain])
+def read_projects(db: Session = Depends(get_db)):
+    projects = project_service.get_all_projects()
+    if projects is None:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return projects
 
 
 @app.put("/projects/{project_id}", response_model=ProjectDomain)

@@ -5,8 +5,8 @@
       <thead>
         <tr>
           <th scope="col">Id</th>
-          <th scope="col">FirstName</th>
-          <th scope="col">LastName</th>
+          <th scope="col">First </th>
+          <th scope="col">Last </th>
           <th scope="col">Email</th>
           <th scope="col">Age</th>
         </tr>
@@ -14,8 +14,8 @@
       <tbody>
         <tr v-for="employee in employees" :key="employee.id">
           <th scope="row">{{ employee.id }}</th>
-          <td>{{ employee.firstName }}</td>
-          <td>{{ employee.lastName }}</td>
+          <td>{{ employee.firstname }}</td>
+          <td>{{ employee.lastname }}</td>
           <td>{{ employee.email }}</td>
           <td>{{ employee.age }}</td>
         </tr>
@@ -38,9 +38,9 @@ export default {
   },
   created() {
     axios
-      .get('http://localhost:8000/employees/1')
+      .get('http://localhost:8000/employees/')
       .then(res => {
-        this.employees = [res.data];
+        this.employees = res.data;
       })
       .catch(error => {
         this.error = 'Error fetching employees: ' + error.message;

@@ -1,20 +1,33 @@
 /* eslint-disable */
 <template>
   <div id="app">
-    <EmployeeComponent />
+    <button @click="loadEmployeeComponent">Load Employee Component</button>
+    <EmployeeComponent v-if="showEmployeeComponent" />
   </div>
 </template>
+
 
 <script>
 import EmployeeComponent from "@/components/EmployeeComponent.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    EmployeeComponent
-  }
-}
+    EmployeeComponent,
+  },
+  data() {
+    return {
+      showEmployeeComponent: false,
+    };
+  },
+  methods: {
+    loadEmployeeComponent() {
+      this.showEmployeeComponent = true;
+    },
+  },
+};
 </script>
+
 
 <style>
 #app {

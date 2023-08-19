@@ -16,6 +16,12 @@ class ProjectRepository:
             id=project_model.id
         )
 
+    def get_all_projects(self) -> list[ProjectDomain]:
+        projects = self.db.query(ProjectModel).all()
+        return [ProjectDomain(id=project.id,
+                              name=project.name,
+                              client=project.client) for project in projects]
+
     def create_project(self, project_create: ProjectDomain):
         project_model = ProjectModel(
             name=project_create.name,
@@ -55,6 +61,14 @@ class EmployeeRepository:
             id=employee_model.id
         )
 
+    def get_all_employees(self) -> list[EmployeeDomain]:
+        employees = self.db.query(EmployeeModel).all()
+        return [EmployeeDomain(id=employee.id,
+                               email=employee.email,
+                               firstname=employee.firstname,
+                               lastname=employee.lastname,
+                               age=employee.age) for employee in employees]
+
     def create_employee(self, employee_create: EmployeeDomain):
         employee_model = EmployeeModel(
             firstname=employee_create.firstname,
@@ -91,6 +105,11 @@ class DepartmentRepository:
             name=department_model.name,
             id=department_model.id
         )
+
+    def get_all_departments(self) -> list[DepartmentDomain]:
+        departments = self.db.query(DepartmentModel).all()
+        return [DepartmentDomain(id=department.id,
+                                 name=department.name) for department in departments]
 
     def create_department(self, department_create: DepartmentDomain):
         department_model = DepartmentModel(

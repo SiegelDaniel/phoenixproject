@@ -14,6 +14,9 @@ class ProjectService:
     def get_project(self, project_id: int):
         return self.project_repo.get_project(project_id)
 
+    def get_all_projects(self):
+        return self.project_repo.get_all_projects()
+
     def update_project(self, project: ProjectDomain):
         return self.project_repo.update_project(project)
 
@@ -31,6 +34,9 @@ class EmployeeService:
     def get_employee(self, department_id: int):
         return self.employee_repo.get_employee(department_id)
 
+    def get_all_employees(self):
+        return self.employee_repo.get_all_employees()
+
     def update_employee(self, employee: EmployeeDomain):
         return self.employee_repo.update_employee(employee)
 
@@ -47,6 +53,9 @@ class DepartmentService:
 
     def get_department(self, department_id: int):
         return self.department_repo.get_department(department_id)
+
+    def get_all_departments(self):
+        return self.department_repo.get_all_departments()
 
     def update_department(self, department: DepartmentDomain):
         return self.department_repo.update_department(department)
