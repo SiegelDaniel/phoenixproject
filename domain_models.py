@@ -25,3 +25,11 @@ class EmployeeDomain(DomainModel):
 class DepartmentDomain(DomainModel):
     name: str
     id: Optional[int] = Field(default=None)
+
+class DepartmentStatisticsDomain(DomainModel):
+    department_id: int
+    department_name: str
+    number_of_employees: int
+    average_age: int
+    number_of_projects: int
+
