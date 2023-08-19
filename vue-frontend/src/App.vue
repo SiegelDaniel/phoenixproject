@@ -5,11 +5,14 @@
       <button @click="activeTab = 'employees'">Employees</button>
       <button @click="activeTab = 'projects'">Projects</button>
       <button @click="activeTab = 'departments'">Departments</button>
+      <button @click="activeTab = 'fileupload'">Upload CSV</button>
+      <button @click="activeTab = 'statistics'">Statistics</button>
     </div>
     <div class="content">
       <EmployeeComponent v-show="activeTab === 'employees'" />
       <ProjectsComponent v-show="activeTab === 'projects'" />
       <DepartmentsComponent v-show="activeTab === 'departments'" />
+      <FileUploadComponent v-show="activeTab === 'fileupload'" />
     </div>
   </div>
 </template>
@@ -20,10 +23,12 @@
 import EmployeeComponent from "@/components/EmployeeComponent.vue";
 import ProjectsComponent from "@/components/ProjectsComponent.vue";
 import DepartmentsComponent from "@/components/DepartmentsComponent.vue";
+import FileUploadComponent from "@/components/FIleUploadComponent.vue";
 
 export default {
   name: "app",
   components: {
+    FileUploadComponent,
     EmployeeComponent,
     ProjectsComponent,
     DepartmentsComponent,

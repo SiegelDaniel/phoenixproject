@@ -5,10 +5,11 @@
       <thead>
         <tr>
           <th scope="col">Id</th>
-          <th scope="col">First </th>
-          <th scope="col">Last </th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
           <th scope="col">Email</th>
           <th scope="col">Age</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,9 @@
           <td>{{ employee.lastname }}</td>
           <td>{{ employee.email }}</td>
           <td>{{ employee.age }}</td>
+          <td>
+            <button @click="deleteEmployee(employee.id)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -37,15 +41,29 @@ export default {
     };
   },
   created() {
-    axios
-      .get('http://localhost:8000/employees/')
-      .then(res => {
-        this.employees = res.data;
-      })
-      .catch(error => {
-        this.error = 'Error fetching employees: ' + error.message;
-      });
+    this.fetchEmployees();
   },
+  methods: {
+    fetchEmployees() {
+      axios
+        .get('http://localhost:8000/employees/')
+        .then(res => {
+          this.employees = res.data;
+        })
+        .catch(error => {
+          this.error = 'Error fetching employees: ' + error.message;
+        });
+    },
+    async deleteEmployee(employeeId) {
+      try {
+        await axios.delete(`http://localhost:8000/employees/${employeeId}`);
+        // After deleting, refresh the employees list
+        this.fetchEmployees();
+      } catch (error) {
+        console.error('Error deleting employee:', error);
+      }
+    }
+  }
 };
 </script>
 
