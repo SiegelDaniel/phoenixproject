@@ -62,7 +62,7 @@ def read_departments(db: Session = Depends(get_db)):
 def update_department(
         department_id: int, department: DepartmentDomain, db: Session = Depends(get_db)
 ):
-    updated_department = department_service.update_department(department)
+    updated_department = department_service.update_department(department_id, department)
     if updated_department is None:
         raise HTTPException(status_code=404, detail="Department not found")
     return updated_department

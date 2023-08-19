@@ -51,10 +51,10 @@ class ProjectRepository:
         projects = []
         for row in df.iterrows():
             projects.append(ProjectModel(
-                id=int(row[0]),
-                name=str(row[1]),
-                client=str(row[2]),
-                department=int(row[3])
+                id=int(row[1]["id"]),
+                name=str(row[1]["name"]),
+                client=str(row[1]["client"]),
+                department_id=int(row[1][3])
             ))
         self.db.add_all(projects)
         self.db.commit()
@@ -96,9 +96,14 @@ class EmployeeRepository:
 
     def update_employee(self, employee_update: EmployeeDomain):
         employee_model = self.db.get(EmployeeModel, employee_update.id)
-        employee_model.name = employee_update.name
+        employee_model.firstname = employee_update.firstname
+        employee_model.lastname = employee_update.lastname
+        employee_model.age = employee_update.age
+        employee_model.email = employee_update.email
+
         self.db.commit()
         self.db.refresh(employee_model)
+        return employee_update
 
     def delete_employee(self, employee_id: int):
         db_employee = self.db.query(EmployeeModel).filter(EmployeeModel.id == employee_id).first()
@@ -146,11 +151,12 @@ class DepartmentRepository:
         self.db.refresh(department_model)
         return department_model
 
-    def update_department(self, department_update: DepartmentDomain):
-        department_model = self.db.get(DepartmentModel, department_update.id)
+    def update_department(self, department_id: int, department_update: DepartmentDomain):
+        department_model = self.db.get(DepartmentModel, department_id)
         department_model.name = department_update.name
         self.db.commit()
         self.db.refresh(department_model)
+        return department_update
 
     def delete_department(self, department_id: int):
         db_department = self.db.query(DepartmentModel).filter(DepartmentModel.id == department_id).first()
