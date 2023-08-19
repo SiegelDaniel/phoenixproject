@@ -31,4 +31,10 @@ There are several limitations in this app that were not fully polished to due la
 - All repositories currently do not support bulk/batch operations.
 
 # Controller
-- The controller currently uses the domain models as DTOs to the frontend. A clean separation of concerns would allow for DTOs, Domain Models and DAOs to be separate.  
+- The controller currently uses the domain models as DTOs to the frontend. A clean separation of concerns would allow for DTOs, Domain Models and DAOs to be separate.
+
+# Frontend
+- As it is written in JS, the frontend practically provides no Type-safety.  This can be migitated by porting it to Typescript.  
+- The styling is very rudimentary and can be improved drastically.  
+- The URLs are hardcoded into the frontend and could be made configurable by an environment variable.  (This is especially interesting for docker-compose deployment)
+
