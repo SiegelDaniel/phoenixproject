@@ -1,8 +1,8 @@
 from pandas import DataFrame
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, subqueryload
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
-from models import ProjectModel, EmployeeModel, DepartmentModel
+from orm_models import ProjectModel, EmployeeModel, DepartmentModel
 
 
 class ProjectRepository:
@@ -14,14 +14,16 @@ class ProjectRepository:
         return ProjectDomain(
             name=project_model.name,
             client=project_model.client,
-            id=project_model.id
+            id=project_model.id,
+            department_id=project_model.department_id
         )
 
     def get_all_projects(self) -> list[ProjectDomain]:
         projects = self.db.query(ProjectModel).all()
         return [ProjectDomain(id=project.id,
                               name=project.name,
-                              client=project.client) for project in projects]
+                              client=project.client,
+                              department_it=project.department_id) for project in projects]
 
     def create_project(self, project_create: ProjectDomain):
         project_model = ProjectModel(
@@ -56,7 +58,8 @@ class ProjectRepository:
                 client=str(row[1]["client"]),
                 department_id=int(row[1][3])
             ))
-        self.db.add_all(projects)
+        for project in projects:
+            self.db.merge(project)
         self.db.commit()
 
 
@@ -138,42 +141,94 @@ class DepartmentRepository:
         )
 
     def get_all_departments(self) -> list[DepartmentDomain]:
-        departments = self.db.query(DepartmentModel).all()
-        return [DepartmentDomain(id=department.id,
-                                 name=department.name) for department in departments]
+        with self.db.begin():
+            departments = self.db.query(DepartmentModel).all()
+            return [DepartmentDomain(id=department.id,
+                                     name=department.name) for department in departments]
 
     def create_department(self, department_create: DepartmentDomain):
-        department_model = DepartmentModel(
-            name=department_create.name
-        )
-        self.db.add(department_model)
-        self.db.commit()
-        self.db.refresh(department_model)
-        return department_model
+        with self.db.begin():
+            department_model = DepartmentModel(
+                name=department_create.name
+            )
+            self.db.add(department_model)
+            self.db.commit()
+            self.db.refresh(department_model)
+            return department_model
 
     def update_department(self, department_id: int, department_update: DepartmentDomain):
-        department_model = self.db.get(DepartmentModel, department_id)
-        department_model.name = department_update.name
-        self.db.commit()
-        self.db.refresh(department_model)
-        return department_update
+        with self.db.begin():
+            department_model = self.db.get(DepartmentModel, department_id)
+            department_model.name = department_update.name
+            self.db.commit()
+            self.db.refresh(department_model)
+            return department_update
 
     def delete_department(self, department_id: int):
-        db_department = self.db.query(DepartmentModel).filter(DepartmentModel.id == department_id).first()
-        if db_department:
-            self.db.delete(db_department)
-            self.db.commit()
-            return db_department
+        with self.db.begin():
+            db_department = self.db.query(DepartmentModel).filter(DepartmentModel.id == department_id).first()
+            if db_department:
+                self.db.delete(db_department)
+                self.db.commit()
+                return db_department
 
     def get_department_by_name(self, department_name: str) -> DepartmentDomain:
-        department_model = self.db.query(DepartmentModel).filter(DepartmentModel.name == department_name).first()
-        if department_model:
-            return DepartmentDomain(**department_model.__dict__)
-        return None
+        with self.db.begin():
+            department_model = self.db.query(DepartmentModel).filter(DepartmentModel.name == department_name).first()
+            if department_model:
+                return DepartmentDomain(**department_model.__dict__)
+            return None
 
     def insert_departments_from_dataframe(self, df: DataFrame):
-        departments = []
-        for row in df.iterrows():
-            departments.append(DepartmentModel(id=int(row[0]), name=str(row[1][1])))
-        self.db.add_all(departments)
-        self.db.commit()
+        with self.db.begin():
+            departments = []
+            for row in df.iterrows():
+                departments.append(DepartmentModel(id=int(row[0]), name=str(row[1][1])))
+            self.db.add_all(departments)
+            self.db.commit()
+
+    def get_average_employee_age_per_department(self):
+        with self.db.begin():
+            departments = self.db.query(DepartmentModel).options(subqueryload(DepartmentModel.employees))
+            average_age_per_department = {}
+            for department in departments:
+                total_age = sum(employee.age for employee in department.employees)
+                employee_count = len(department.employees)
+                average_age = total_age / employee_count if employee_count > 0 else 0
+                average_age_per_department[department.id] = average_age
+
+            return average_age_per_department
+
+    def get_number_of_projects_per_department(self):
+        with self.db.begin():
+            departments = self.db.query(DepartmentModel).options(
+                subqueryload(DepartmentModel.projects)
+            ).all()
+
+            number_of_projects_per_department = {}
+            for department in departments:
+                number_of_projects = len(department.projects)
+                number_of_projects_per_department[department.id] = number_of_projects
+
+            return number_of_projects_per_department
+
+    def get_employees_per_department(self):
+        with self.db.begin():
+            departments = self.db.query(DepartmentModel).options(
+                subqueryload(DepartmentModel.employees)
+            ).all()
+
+            employees_per_department = {}
+            for department in departments:
+                employees_per_department[department.id] = [
+                    EmployeeDomain(
+                        id=employee.id,
+                        firstname=employee.firstname,
+                        lastname=employee.lastname,
+                        email=employee.email,
+                        age=employee.age
+                    )
+                    for employee in department.employees
+                ]
+
+            return employees_per_department

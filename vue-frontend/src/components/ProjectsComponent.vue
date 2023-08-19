@@ -7,6 +7,7 @@
           <th scope="col">Id</th>
           <th scope="col">Name</th>
           <th scope="col">Client</th>
+          <th scope="col">Department ID</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -15,6 +16,7 @@
           <th scope="row">{{ project.id }}</th>
           <td>{{ project.name }}</td>
           <td>{{ project.client }}</td>
+          <td>{{ project.department_id }}</td>
           <td>
             <button @click="deleteProject(project.id)">Delete</button>
           </td>

@@ -23,7 +23,9 @@ It assumes you are running the backend at ```localhost:8000```.
 
 # Limitations
 There are several limitations in this app that were not fully polished to due lack of time.
-A general limitation is the lack of async operations.
+- A general limitation is the lack of async operations.
+- The session management is not optimized yet. It does not allow for concurrent access to a database as it does not use scoped sessions.  
+- There are no tests (yet)
 
  # Repository
 - All repositories currently do not support bulk/batch operations.

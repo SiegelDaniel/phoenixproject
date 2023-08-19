@@ -3,9 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
-from models import Base
+from orm_models import Base
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
-from services import ProjectService, EmployeeService, DepartmentService, FileService
+from services import ProjectService, EmployeeService, DepartmentService, FileService, DepartmentStatisticsService
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -20,7 +20,7 @@ app.add_middleware(CORSMiddleware,
                    allow_headers=["*"])
 DATABASE_URL = "postgresql://postgres:phoenix@127.0.0.1:5432/db"
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autoflush=True, bind=engine)
 
 Base.metadata.create_all(bind=engine)
 
@@ -36,11 +36,13 @@ def get_db():
 project_repository = ProjectRepository(get_db().__next__())
 employee_repository = EmployeeRepository(get_db().__next__())
 department_repository = DepartmentRepository(get_db().__next__())
+statistics_repository = DepartmentRepository(get_db().__next__())
 
 project_service = ProjectService(project_repository)
 employee_service = EmployeeService(employee_repository)
 department_service = DepartmentService(department_repository)
 fileservice = FileService(department_repository, employee_repository, project_repository)
+departmentstatisticsservice = DepartmentStatisticsService(statistics_repository)
 
 
 @app.get("/departments/{department_id}", response_model=DepartmentDomain)
@@ -132,7 +134,7 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
 def read_projects(db: Session = Depends(get_db)):
     projects = project_service.get_all_projects()
     if projects is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=404, detail="Projects not found")
     return projects
 
 
@@ -169,3 +171,11 @@ def get_department_id_by_name(department_name: str, db: Session = Depends(get_db
     if department is None:
         raise HTTPException(status_code=404, detail="Department not found")
     return {"department_id": department.id}
+
+@app.get("/statistics/departments")
+def get_department_statistics(db: Session = Depends(get_db)):
+    statistics = departmentstatisticsservice.get_statistics_per_department()
+    if statistics is None:
+        raise HTTPException(status_code=404, detail="Department not found")
+    return statistics
+

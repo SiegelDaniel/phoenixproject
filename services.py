@@ -1,9 +1,10 @@
+import time
 from io import StringIO
 
 from fastapi import UploadFile
 import pandas as pd
 
-from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
+from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain, DepartmentStatisticsDomain
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
 
 
@@ -71,18 +72,19 @@ class DepartmentService:
 
 
 class FileService:
-    def __init__(self, department_repo: DepartmentRepository, employee_repo: EmployeeRepository, project_repo: ProjectRepository):
+    def __init__(self, department_repo: DepartmentRepository, employee_repo: EmployeeRepository,
+                 project_repo: ProjectRepository):
         self.project_repo = project_repo
         self.department_repo = department_repo
         self.employee_repo = employee_repo
 
     def process_file(self, file: UploadFile):
-        if("employee" in file.filename):
+        if ("employee" in file.filename):
             self._insert_employees_from_csv(file)
-        elif("department" in file.filename):
+        elif ("department" in file.filename):
             df = pd.read_csv(StringIO(file.file.read().decode('utf-8')), sep=';')
             self.department_repo.insert_departments_from_dataframe(df)
-        elif("project" in file.filename):
+        elif ("project" in file.filename):
             self._insert_projects_from_csv(file)
         return {}
 
@@ -101,3 +103,28 @@ class FileService:
             department_id = self.department_repo.get_department_by_name(department_name).id
             df.at[index, 4] = department_id
         self.employee_repo.create_employees_from_dataframe(df)
+
+
+class DepartmentStatisticsService:
+    def __init__(self, department_repo: DepartmentRepository):
+        self.department_repo = department_repo
+
+    def get_statistics_per_department(self) -> list[DepartmentStatisticsDomain]:
+        domain_statistic_list = []
+        departments = self.department_repo.get_all_departments()
+        average_age_by_department_id = self.department_repo.get_average_employee_age_per_department()
+        number_of_projects_by_department_id = self.department_repo.get_number_of_projects_per_department()
+        employees_as_dict_by_department_id = self.department_repo.get_employees_per_department()
+
+        for department in departments:
+            domain_statistic_list.append(
+                DepartmentStatisticsDomain(
+                    department_id=int(department.id),
+                    department_name=department.name,
+                    employees=employees_as_dict_by_department_id[department.id],
+                    average_age=average_age_by_department_id[department.id],
+                    number_of_projects=number_of_projects_by_department_id[department.id]
+                )
+            )
+
+        return domain_statistic_list

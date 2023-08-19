@@ -13,6 +13,7 @@
       <ProjectsComponent v-show="activeTab === 'projects'" />
       <DepartmentsComponent v-show="activeTab === 'departments'" />
       <FileUploadComponent v-show="activeTab === 'fileupload'" />
+      <StatisticsComponent v-show="activeTab === 'statistics'" />
     </div>
   </div>
 </template>
@@ -24,10 +25,12 @@ import EmployeeComponent from "@/components/EmployeeComponent.vue";
 import ProjectsComponent from "@/components/ProjectsComponent.vue";
 import DepartmentsComponent from "@/components/DepartmentsComponent.vue";
 import FileUploadComponent from "@/components/FIleUploadComponent.vue";
+import StatisticsComponent from "@/components/StatisticsComponent.vue";
 
 export default {
   name: "app",
   components: {
+    StatisticsComponent,
     FileUploadComponent,
     EmployeeComponent,
     ProjectsComponent,
