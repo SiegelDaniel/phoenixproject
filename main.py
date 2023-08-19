@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
-from models import Base, EmployeeModel, ProjectModel, DepartmentModel
+from models import Base
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
 from services import ProjectService, EmployeeService, DepartmentService
 
