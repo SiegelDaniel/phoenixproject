@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
 from models import Base
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
-from services import ProjectService, EmployeeService, DepartmentService
+from services import ProjectService, EmployeeService, DepartmentService, FileService
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -40,6 +40,7 @@ department_repository = DepartmentRepository(get_db().__next__())
 project_service = ProjectService(project_repository)
 employee_service = EmployeeService(employee_repository)
 department_service = DepartmentService(department_repository)
+fileservice = FileService(department_repository, employee_repository, project_repository)
 
 
 @app.get("/departments/{department_id}", response_model=DepartmentDomain)
@@ -156,3 +157,15 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
 @app.post("/projects/", response_model=ProjectDomain)
 def create_project(project: ProjectDomain, db: Session = Depends(get_db)):
     return project_service.create_project(project)
+
+
+@app.post("/upload/")
+def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    return fileservice.process_file(file)
+
+@app.get("/departments/{department_name}")
+def get_department_id_by_name(department_name: str, db: Session = Depends(get_db)):
+    department = department_service.get_department_by_name(department_name)
+    if department is None:
+        raise HTTPException(status_code=404, detail="Department not found")
+    return {"department_id": department.id}

@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from sqlalchemy.orm import Session
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
@@ -45,6 +46,18 @@ class ProjectRepository:
             self.db.delete(db_project)
             self.db.commit()
             return db_project
+
+    def create_projects_from_dataframe(self, df: DataFrame):
+        projects = []
+        for row in df.iterrows():
+            projects.append(ProjectModel(
+                id=int(row[0]),
+                name=str(row[1]),
+                client=str(row[2]),
+                department=int(row[3])
+            ))
+        self.db.add_all(projects)
+        self.db.commit()
 
 
 class EmployeeRepository:
@@ -94,6 +107,19 @@ class EmployeeRepository:
             self.db.commit()
             return db_employee
 
+    def create_employees_from_dataframe(self, df: DataFrame):
+        employees = []
+        for row in df.iterrows():
+            employees.append(EmployeeModel(
+                email=str(row[1]["email"]),
+                lastname=str(row[1]["lastname"]),
+                firstname=str(row[1]["firstname"]),
+                age=int(row[1]["age"]),
+                department_id=int(row[1][4])
+            ))
+        self.db.add_all(employees)
+        self.db.commit()
+
 
 class DepartmentRepository:
     def __init__(self, db: Session):
@@ -132,3 +158,16 @@ class DepartmentRepository:
             self.db.delete(db_department)
             self.db.commit()
             return db_department
+
+    def get_department_by_name(self, department_name: str) -> DepartmentDomain:
+        department_model = self.db.query(DepartmentModel).filter(DepartmentModel.name == department_name).first()
+        if department_model:
+            return DepartmentDomain(**department_model.__dict__)
+        return None
+
+    def insert_departments_from_dataframe(self, df: DataFrame):
+        departments = []
+        for row in df.iterrows():
+            departments.append(DepartmentModel(id=int(row[0]), name=str(row[1][1])))
+        self.db.add_all(departments)
+        self.db.commit()

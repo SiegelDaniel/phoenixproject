@@ -1,4 +1,7 @@
-from sqlalchemy.orm import Session
+from io import StringIO
+
+from fastapi import UploadFile
+import pandas as pd
 
 from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
@@ -62,3 +65,39 @@ class DepartmentService:
 
     def delete_department(self, department_id: int):
         return self.department_repo.delete_department(department_id)
+
+    def get_department_by_name(self, department_name: str):
+        return self.department_repo.get_department_by_name(department_name)
+
+
+class FileService:
+    def __init__(self, department_repo: DepartmentRepository, employee_repo: EmployeeRepository, project_repo: ProjectRepository):
+        self.project_repo = project_repo
+        self.department_repo = department_repo
+        self.employee_repo = employee_repo
+
+    def process_file(self, file: UploadFile):
+        if("employee" in file.filename):
+            self._insert_employees_from_csv(file)
+        elif("department" in file.filename):
+            df = pd.read_csv(StringIO(file.file.read().decode('utf-8')), sep=';')
+            self.department_repo.insert_departments_from_dataframe(df)
+        elif("project" in file.filename):
+            self._insert_projects_from_csv(file)
+        return {}
+
+    def _insert_projects_from_csv(self, file):
+        df = pd.read_csv(StringIO(file.file.read().decode('utf-8')), sep=';')
+        for index, row in df.iterrows():
+            department_name = row[3]
+            department_id = self.department_repo.get_department_by_name(department_name).id
+            df.at[index, 3] = department_id
+        self.project_repo.create_projects_from_dataframe(df)
+
+    def _insert_employees_from_csv(self, file):
+        df = pd.read_csv(StringIO(file.file.read().decode('utf-8')), sep=';')
+        for index, row in df.iterrows():
+            department_name = row[4]
+            department_id = self.department_repo.get_department_by_name(department_name).id
+            df.at[index, 4] = department_id
+        self.employee_repo.create_employees_from_dataframe(df)
