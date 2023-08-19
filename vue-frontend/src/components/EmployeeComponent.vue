@@ -20,12 +20,26 @@
           <td>{{ employee.email }}</td>
           <td>{{ employee.age }}</td>
           <td>
+            <button @click="openEditPopup(employee)">Edit</button>
             <button @click="deleteEmployee(employee.id)">Delete</button>
           </td>
         </tr>
       </tbody>
     </table>
     <p v-if="error" class="error-message">{{ error }}</p>
+
+    <!-- Edit Popup -->
+    <div v-if="editingEmployee" class="popup">
+      <div class="popup-content">
+        <h3>Edit Employee</h3>
+        <input v-model="editingEmployee.firstname" />
+        <input v-model="editingEmployee.lastname" />
+        <input v-model="editingEmployee.email" />
+        <input v-model="editingEmployee.age" />
+        <button @click="saveEditedEmployee">Save</button>
+        <button @click="closeEditPopup">Cancel</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,6 +51,7 @@ export default {
   data() {
     return {
       employees: null,
+      editingEmployee: null,
       error: null,
     };
   },
@@ -49,6 +64,7 @@ export default {
         .get('http://localhost:8000/employees/')
         .then(res => {
           this.employees = res.data;
+          this.sortEmployeesById(); // Sort employees after fetching
         })
         .catch(error => {
           this.error = 'Error fetching employees: ' + error.message;
@@ -57,15 +73,32 @@ export default {
     async deleteEmployee(employeeId) {
       try {
         await axios.delete(`http://localhost:8000/employees/${employeeId}`);
-        // After deleting, refresh the employees list
-        this.fetchEmployees();
+        this.fetchEmployees(); // Fetch and sort employees after deleting
       } catch (error) {
         console.error('Error deleting employee:', error);
       }
+    },
+    openEditPopup(employee) {
+      this.editingEmployee = { ...employee };
+    },
+    closeEditPopup() {
+      this.editingEmployee = null;
+    },
+    async saveEditedEmployee() {
+      try {
+        await axios.put(`http://localhost:8000/employees/${this.editingEmployee.id}`, this.editingEmployee);
+        this.fetchEmployees(); // Fetch and sort employees after saving
+      } catch (error) {
+        console.error('Error updating employee:', error);
+      }
+    },
+    sortEmployeesById() {
+      this.employees.sort((a, b) => a.id - b.id);
     }
   }
 };
 </script>
+
 
 <style>
 h3 {
@@ -74,5 +107,22 @@ h3 {
 .error-message {
   color: red;
   font-weight: bold;
+}
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
 }
 </style>
