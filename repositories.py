@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from domain_models import DepartmentDomain
+from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
 from models import ProjectModel, EmployeeModel, DepartmentModel
 
 
@@ -8,24 +8,74 @@ class ProjectRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_project(self, project):
-        db_project = ProjectModel(**project.dict())
-        self.db.add(db_project)
+    def get_project(self, project_id: int) -> ProjectDomain:
+        project_model = self.db.get(ProjectModel, project_id)
+        return ProjectDomain(
+            name=project_model.name,
+            client=project_model.client,
+            id=project_model.id
+        )
+
+    def create_project(self, project_create: ProjectDomain):
+        project_model = ProjectModel(
+            name=project_create.name,
+            client=project_create.client
+        )
+        self.db.add(project_model)
         self.db.commit()
-        self.db.refresh(db_project)
-        return db_project
+        self.db.refresh(project_model)
+        return project_model
+
+    def update_project(self, project_update: ProjectDomain):
+        project_model = self.db.get(ProjectModel, project_update.id)
+        project_model.name = project_update.name
+        project_model.client = project_update.client
+        self.db.commit()
+        self.db.refresh(project_model)
+
+    def delete_project(self, project_id: int):
+        db_project = self.db.query(ProjectModel).filter(ProjectModel.id == project_id).first()
+        if db_project:
+            self.db.delete(db_project)
+            self.db.commit()
+            return db_project
 
 
 class EmployeeRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_employee(self, employee):
-        db_employee = EmployeeModel(**employee.dict())
-        self.db.add(db_employee)
+    def get_employee(self, employee_id: int) -> EmployeeDomain:
+        employee_model = self.db.get(EmployeeModel, employee_id)
+        return EmployeeDomain(
+            firstname=employee_model.firstname,
+            lastname=employee_model.lastname,
+            email=employee_model.email,
+            age=employee_model.age,
+            id=employee_model.id
+        )
+
+    def create_employee(self, employee_create: EmployeeDomain):
+        employee_model = EmployeeModel(
+            name=employee_create.name
+        )
+        self.db.add(employee_model)
         self.db.commit()
-        self.db.refresh(db_employee)
-        return db_employee
+        self.db.refresh(employee_model)
+        return employee_model
+
+    def update_employee(self, employee_update: EmployeeDomain):
+        employee_model = self.db.get(EmployeeModel, employee_update.id)
+        employee_model.name = employee_update.name
+        self.db.commit()
+        self.db.refresh(employee_model)
+
+    def delete_employee(self, employee_id: int):
+        db_employee = self.db.query(EmployeeModel).filter(EmployeeModel.id == employee_id).first()
+        if db_employee:
+            self.db.delete(db_employee)
+            self.db.commit()
+            return db_employee
 
 
 class DepartmentRepository:
