@@ -6,9 +6,18 @@ from domain_models import DepartmentDomain, EmployeeDomain, ProjectDomain
 from models import Base
 from repositories import ProjectRepository, EmployeeRepository, DepartmentRepository
 from services import ProjectService, EmployeeService, DepartmentService
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+origins= [
+    "http://localhost",
+    "http://localhost:8080"
+]
+app.add_middleware(CORSMiddleware,
+                   allow_origins=origins,
+                   allow_methods=["*"],
+                   allow_headers=["*"])
 DATABASE_URL = "postgresql://postgres:phoenix@127.0.0.1:5432/db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

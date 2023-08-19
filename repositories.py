@@ -57,7 +57,10 @@ class EmployeeRepository:
 
     def create_employee(self, employee_create: EmployeeDomain):
         employee_model = EmployeeModel(
-            name=employee_create.name
+            firstname=employee_create.firstname,
+            lastname=employee_create.lastname,
+            email=employee_create.email,
+            age=employee_create.age
         )
         self.db.add(employee_model)
         self.db.commit()
