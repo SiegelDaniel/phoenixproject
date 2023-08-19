@@ -15,7 +15,11 @@ We create a container with a PostgreSQL database. It is not necessary to use Pos
 If you are not using this PostgreSQL container, then make sure to change the connection string in main.py.
 
 # Node
-Install NodeJS to host the frontend: https://nodejs.org/de/download
+Install NodeJS to host the frontend: https://nodejs.org/de/download  
+
+## Running the frontend  
+In the phoenix2/vue-frontend, run ``` npm install & npm run serve```.  
+It assumes you are running the backend at ```localhost:8000```.
 
 # Limitations
 There are several limitations in this app that were not fully polished to due lack of time.
@@ -26,4 +30,3 @@ A general limitation is the lack of async operations.
 
 # Controller
 - The controller currently uses the domain models as DTOs to the frontend. A clean separation of concerns would allow for DTOs, Domain Models and DAOs to be separate.  
-- 
