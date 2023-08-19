@@ -60,8 +60,8 @@ class DepartmentService:
     def get_all_departments(self):
         return self.department_repo.get_all_departments()
 
-    def update_department(self, department: DepartmentDomain):
-        return self.department_repo.update_department(department)
+    def update_department(self, department_id: int, department: DepartmentDomain):
+        return self.department_repo.update_department(department_id, department)
 
     def delete_department(self, department_id: int):
         return self.department_repo.delete_department(department_id)
