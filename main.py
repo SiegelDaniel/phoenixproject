@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins= [
+origins = [
     "http://localhost",
     "http://localhost:8080"
 ]
@@ -52,6 +52,7 @@ def read_department(department_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Department not found")
     return department
 
+
 @app.get("/departments/", response_model=list[DepartmentDomain])
 def read_departments(db: Session = Depends(get_db)):
     departments = department_service.get_all_departments()
@@ -92,12 +93,14 @@ def read_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
 
+
 @app.get("/employees/", response_model=list[EmployeeDomain])
 def read_employee(db: Session = Depends(get_db)):
     employees = employee_service.get_all_employees()
     if employees is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     return employees
+
 
 @app.put("/employees/{employee_id}", response_model=EmployeeDomain)
 def update_employee(
@@ -129,6 +132,7 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
     if project is None:
         raise HTTPException(status_code=404, detail="Project not found")
     return project
+
 
 @app.get("/projects/", response_model=list[ProjectDomain])
 def read_projects(db: Session = Depends(get_db)):
@@ -165,6 +169,7 @@ def create_project(project: ProjectDomain, db: Session = Depends(get_db)):
 def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
     return fileservice.process_file(file)
 
+
 @app.get("/departments/{department_name}")
 def get_department_id_by_name(department_name: str, db: Session = Depends(get_db)):
     department = department_service.get_department_by_name(department_name)
@@ -172,10 +177,10 @@ def get_department_id_by_name(department_name: str, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Department not found")
     return {"department_id": department.id}
 
+
 @app.get("/statistics/departments")
 def get_department_statistics(db: Session = Depends(get_db)):
     statistics = departmentstatisticsservice.get_statistics_per_department()
     if statistics is None:
         raise HTTPException(status_code=404, detail="Department not found")
     return statistics
-

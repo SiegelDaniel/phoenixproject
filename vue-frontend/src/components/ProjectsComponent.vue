@@ -55,7 +55,6 @@ export default {
     async deleteProject(projectId) {
       try {
         await axios.delete(`http://localhost:8000/projects/${projectId}`);
-        // After deleting, refresh the projects list
         this.fetchProjects();
       } catch (error) {
         console.error('Error deleting project:', error);

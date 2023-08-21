@@ -12,7 +12,7 @@ class ProjectDomain(DomainModel):
     name: str
     client: str
     id: Optional[int] = Field(default=None)
-    department_id:Optional[int] = Field(default=None)
+    department_id: Optional[int] = Field(default=None)
 
 
 class EmployeeDomain(DomainModel):
@@ -27,10 +27,10 @@ class DepartmentDomain(DomainModel):
     name: str
     id: Optional[int] = Field(default=None)
 
+
 class DepartmentStatisticsDomain(DomainModel):
     department_id: Optional[int] = Field(default=None)
     department_name: str
     employees: list[EmployeeDomain]
     average_age: float
     number_of_projects: int
-

@@ -42,7 +42,7 @@ export default {
   data() {
     return {
       departments: null,
-      selectedDepartment: null, // To store the selected department for popup
+      selectedDepartment: null,
       error: null,
     };
   },
@@ -63,7 +63,6 @@ export default {
     async deleteDepartment(departmentId) {
       try {
         await axios.delete(`http://localhost:8000/departments/${departmentId}`);
-        // After deleting, refresh the departments list
         this.fetchDepartments();
       } catch (error) {
         console.error('Error deleting department:', error);
@@ -71,7 +70,7 @@ export default {
     },
     showPopup(department) {
       this.selectedDepartment = department;
-      this.editedDepartmentName = department.name; // Initialize the editable field
+      this.editedDepartmentName = department.name;
     },
      closePopup() {
       this.selectedDepartment = null;
@@ -83,7 +82,6 @@ export default {
           name: this.editedDepartmentName,
         });
 
-        // Update department name in the departments array
         const editedIndex = this.departments.findIndex(department => department.id === this.selectedDepartment.id);
         if (editedIndex !== -1) {
           this.departments[editedIndex].name = this.editedDepartmentName;

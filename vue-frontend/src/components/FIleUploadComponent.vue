@@ -2,7 +2,6 @@
   <div>
     <button @click="openFileDialog">Select File</button>
     <input type="file" ref="fileInput" style="display: none" @change="handleFileChange" />
-    <!-- Rest of your component content -->
   </div>
 </template>
 

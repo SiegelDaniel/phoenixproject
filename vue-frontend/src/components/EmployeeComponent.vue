@@ -64,7 +64,7 @@ export default {
         .get('http://localhost:8000/employees/')
         .then(res => {
           this.employees = res.data;
-          this.sortEmployeesById(); // Sort employees after fetching
+          this.sortEmployeesById();
         })
         .catch(error => {
           this.error = 'Error fetching employees: ' + error.message;
@@ -73,7 +73,7 @@ export default {
     async deleteEmployee(employeeId) {
       try {
         await axios.delete(`http://localhost:8000/employees/${employeeId}`);
-        this.fetchEmployees(); // Fetch and sort employees after deleting
+        this.fetchEmployees();
       } catch (error) {
         console.error('Error deleting employee:', error);
       }
@@ -87,7 +87,7 @@ export default {
     async saveEditedEmployee() {
       try {
         await axios.put(`http://localhost:8000/employees/${this.editingEmployee.id}`, this.editingEmployee);
-        this.fetchEmployees(); // Fetch and sort employees after saving
+        this.fetchEmployees();
       } catch (error) {
         console.error('Error updating employee:', error);
       }

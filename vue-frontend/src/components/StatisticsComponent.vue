@@ -27,7 +27,6 @@
     </table>
     <p v-if="error" class="error-message">{{ error }}</p>
 
-    <!-- Employees Popup -->
     <div class="popup" v-if="selectedEmployees">
       <div class="popup-content">
         <h2>Employees List</h2>
