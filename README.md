@@ -21,6 +21,9 @@ Install NodeJS to host the frontend: https://nodejs.org/de/download
 In the phoenix2/vue-frontend, run ``` npm install & npm run serve```.  
 It assumes you are running the backend at ```localhost:8000```.
 
+## API Specification
+The API specification can be viewed at ```localhost:8000/docs```
+
 # Limitations
 There are several limitations in this app that were not fully polished to due lack of time.
 - A general limitation is the lack of async operations.
@@ -29,6 +32,8 @@ There are several limitations in this app that were not fully polished to due la
 
  # Repository
 - All repositories currently do not support bulk/batch operations.
+- Importing files needs a specific order due to the relations between Employees, Departments and Projects.  
+- The order is as follows: departments => projects => employees 
 
 # Controller
 - The controller currently uses the domain models as DTOs to the frontend. A clean separation of concerns would allow for DTOs, Domain Models and DAOs to be separate.
